@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { JokeService } from './joke.service';
 
 @Component({
@@ -10,6 +10,12 @@ import { JokeService } from './joke.service';
 export class AppComponent {
   
   @ViewChild('button') button!: ElementRef;
+  public speaking: boolean=false;
+  @HostListener('window:keydown.Space', ['$event'])
+  listenSpace(e: KeyboardEvent): void {
+      if(this.speaking==false){
+      this.getJoke();}
+  }
   title = 'jokeApi';
   public voices:any=[]
   jokeData: any;
@@ -29,6 +35,7 @@ export class AppComponent {
     let punchLine = new SpeechSynthesisUtterance (res.punchline)
     punchLine.pitch=3
     setup.addEventListener('start',(e)=>{
+      this.speaking=true;
       this.button.nativeElement.disabled=true;
       
     })
@@ -39,6 +46,7 @@ export class AppComponent {
     })
    this.speak(setup,res.setup)
    punchLine.addEventListener('end',(event)=>{
+    this.speaking=false;
     this.button.nativeElement.disabled=false;
     this.jokeData=''
    })
